@@ -1,0 +1,73 @@
+import { Link } from "react-router-dom";
+import Ucard from "./Ucard";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
+import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
+import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
+
+const SampleNextArrow = (props) => {
+  const { onClick } = props
+  return (
+    <div className='control-btn' onClick={onClick}>
+      <button className='next nextup' >
+        <ArrowCircleRightIcon ></ArrowCircleRightIcon>
+      </button>
+    </div>
+  )
+}
+const SamplePrevArrow = (props) => {
+  const { onClick } = props
+  return (
+    <div className='control-btn' onClick={onClick}>
+      <button className='prev prevup'>
+        <ArrowCircleLeftIcon></ArrowCircleLeftIcon>
+      </button>
+    </div>
+  )
+}
+const Upcomming = ({ items, title }) => {
+  const settings = {
+    dots: false,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 3,
+    slidesToScroll: 1,
+    nextArrow: <SampleNextArrow />,
+    prevArrow: <SamplePrevArrow />,
+    responsive: [
+      {
+        breakpoint: 800,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 1,
+        },
+      },
+    ],
+  }
+  return (
+    <>
+      <section className='upcome'>
+        <div className='container'>
+          <div className='heading flexSB' style={{ marginTop: title === "Upcomming Movies" ? "800px" : "0"}}>
+            <h1>{title}</h1>
+            <Link to='/'>View All</Link>
+          </div>
+          <div className='content'>
+            <Slider {...settings}>
+              {items.map((item) => {
+                return (
+                  <>
+                    <Ucard key={item._id} item={item} />
+                  </>
+                )
+              })}
+            </Slider>
+          </div>
+        </div>
+      </section>
+    </>
+  )
+}
+
+export default Upcomming
