@@ -1,31 +1,34 @@
 import { Link } from "react-router-dom";
 import Ucard from "./Ucard";
 import Slider from "react-slick";
+import { Container, Row, Col, Button } from 'react-bootstrap'; // Bootstrap components
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import ArrowCircleRightIcon from '@mui/icons-material/ArrowCircleRight';
 import ArrowCircleLeftIcon from '@mui/icons-material/ArrowCircleLeft';
 
 const SampleNextArrow = (props) => {
-  const { onClick } = props
+  const { onClick } = props;
   return (
-    <div className='control-btn' onClick={onClick}>
-      <button className='next nextup' >
-        <ArrowCircleRightIcon ></ArrowCircleRightIcon>
-      </button>
+    <div className="control-btn" onClick={onClick}>
+      <Button variant="success" className="next nextup">
+        <ArrowCircleRightIcon />
+      </Button>
     </div>
-  )
-}
+  );
+};
+
 const SamplePrevArrow = (props) => {
-  const { onClick } = props
+  const { onClick } = props;
   return (
-    <div className='control-btn' onClick={onClick}>
-      <button className='prev prevup'>
-        <ArrowCircleLeftIcon></ArrowCircleLeftIcon>
-      </button>
+    <div className="control-btn" onClick={onClick}>
+      <Button variant="success" className="prev prevup">
+        <ArrowCircleLeftIcon />
+      </Button>
     </div>
-  )
-}
+  );
+};
+
 const Upcomming = ({ items, title }) => {
   const settings = {
     dots: false,
@@ -44,30 +47,29 @@ const Upcomming = ({ items, title }) => {
         },
       },
     ],
-  }
-  return (
-    <>
-      <section className='upcome'>
-        <div className='container'>
-          <div className='heading flexSB' style={{ marginTop: title === "Upcomming Movies" ? "800px" : "0"}}>
-            <h1>{title}</h1>
-            <Link to='/'>View All</Link>
-          </div>
-          <div className='content'>
-            <Slider {...settings}>
-              {items.map((item) => {
-                return (
-                  <>
-                    <Ucard key={item._id} item={item} />
-                  </>
-                )
-              })}
-            </Slider>
-          </div>
-        </div>
-      </section>
-    </>
-  )
-}
+  };
 
-export default Upcomming
+  return (
+    <section className="upcome" style={{ marginBottom: '40px' }}>
+      <Container>
+        <div className="heading d-flex justify-content-between" style={{ marginTop: title === "Upcoming Movies" ? "800px" : "0" }}>
+          <h1>{title}</h1>
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <Button variant="outline-success">View All</Button>
+          </Link>
+        </div>
+        <div className="content">
+          <Slider {...settings}>
+            {items.map((item) => (
+              <div key={item._id}>
+                <Ucard item={item} />
+              </div>
+            ))}
+          </Slider>
+        </div>
+      </Container>
+    </section>
+  );
+};
+
+export default Upcomming;

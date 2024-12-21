@@ -55,6 +55,8 @@ import "./App.css";
 import TheaterMovies from "./components/Theater/TheaterMovies.jsx";
 
 
+
+
 function App() {
 
   const isLoggedIn = localStorage.getItem("token");

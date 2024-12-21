@@ -1,19 +1,18 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { Card, Button, Row, Col } from 'react-bootstrap';
 import PlayCircleFilledIcon from '@mui/icons-material/PlayCircleFilled';
+import { Box, Typography } from '@mui/material';
 
 const HomeCard = ({
   item: {
-    _id:movieId,
+    _id: movieId,
     image,
     title,
     description,
     duration,
     language,
     genre,
-    director,
-    starring,
-    trailer,
   },
 }) => {
   const [isTrailerPlaying, setIsTrailerPlaying] = useState(false);
@@ -29,45 +28,61 @@ const HomeCard = ({
   };
 
   return (
-    <div className='box'>
-      <div className='coverImage'>
-        <img src={image} alt={title} />
-      </div>
-      <div className='content flex'>
-        <div className='details row'>
-          <h1 style={{color:'white'}}>{title}</h1>
-          <div className='rating flex'>
-            <label>{language}</label>
-            <span>{genre}</span>
-            <label>{formatDuration(duration)}</label>
-          </div>
-          <p>{description}</p>
+    <Card className="mb-4" style={{ border: "none", position: "relative" }}>
+      {/* Banner image */}
+      <Card.Img
+        variant="top"
+        src={image}
+        alt={title}
+        style={{
+          width: '100%',
+          height: '400px', // Adjust to your desired banner height
+          objectFit: 'cover', // Makes the image cover the area
+        }}
+      />
 
-          <Link to={`/movie/${movieId}`}>
-          <button className='primary-btn'>
-            <PlayCircleFilledIcon></PlayCircleFilledIcon> PLAY NOW
-          </button>
-          </Link>
+      {/* Overlay Content */}
+      <Box
+        sx={{
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          zIndex: 1,
+          color: 'white',
+          width: '100%',
+          padding: '20px',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* Title and details */}
+        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+          {title}
+        </Typography>
+        <Typography variant="body1" sx={{ marginTop: '8px' }}>
+          {language} | {genre} | {formatDuration(duration)}
+        </Typography>
+        <Typography variant="body2" sx={{ marginTop: '10px', maxWidth: '500px' }}>
+          {description}
+        </Typography>
 
-        </div>
-        <div className='playButton row'>
-          <Link to={`/movie/${movieId}`}>
-            <button className="trailer-btn">
-                <PlayCircleFilledIcon className="play-btn" sx={{ fontSize: 130 }}></PlayCircleFilledIcon>
-            </button>
-          </Link>
-          {/* {isTrailerPlaying ? (
-            <video width="400" controls autoPlay>
-              <source src={trailer} type="video/mp4" />
-            </video>
-          ) : (
-            <button className="trailer-btn" onClick={handlePlayTrailer}>
-              <PlayCircleFilledIcon className="play-btn" sx={{ fontSize: 130 }}></PlayCircleFilledIcon>
-            </button>
-          )} */}
-        </div>
-      </div>
-    </div>
+        {/* Play Now Button */}
+        <Link to={`/movie/${movieId}`}>
+          <Button
+            variant="primary"
+            sx={{
+              marginTop: '20px',
+              textTransform: 'none',
+              display: 'flex',
+              alignItems: 'center',
+            }}
+          >
+            <PlayCircleFilledIcon sx={{ marginRight: 1 }} />
+            Play Now
+          </Button>
+        </Link>
+      </Box>
+    </Card>
   );
 };
 

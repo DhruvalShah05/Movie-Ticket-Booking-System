@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import "./home.css";
 import Home from "./Home";
 import { getAllMovies } from "../../api/Movie_api/getAllmovie";
 
@@ -9,7 +8,7 @@ const Homes = () => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        const movies = await getAllMovies(); 
+        const movies = await getAllMovies();
         setItems(movies);
       } catch (error) {
         console.error("Error fetching movies:", error);
@@ -21,10 +20,15 @@ const Homes = () => {
 
   return (
     <>
-      <section className="home">
+      <section
+        className="home"
+        style={{
+          margin: "0 20px", // Apply margin on both sides
+        }}
+      >
         <Home items={items} />
       </section>
-      <div className="margin"></div>
+      <div className="margin" style={{ height: "20px" }}></div> {/* Space below */}
     </>
   );
 };

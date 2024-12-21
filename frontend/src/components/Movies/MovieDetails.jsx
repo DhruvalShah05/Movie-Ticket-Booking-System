@@ -12,7 +12,7 @@ import { useParams } from 'react-router-dom';
 import { getMovieById } from '../../api/Movie_api/getAllmovie';
 import { fetchBookedSeats, saveReservation, sendOTP, verifyOTP } from '../../api/Reservation_api/Reservation';
 import { v4 as uuidv4 } from 'uuid';
-import "./movieDetails.css";
+import { useMediaQuery } from '@mui/material';  // Import for responsive design
 
 const MovieDetails = () => {
   const { movieId } = useParams();
@@ -23,7 +23,7 @@ const MovieDetails = () => {
   const [Seats, setSeats] = useState([]);
   const [Date, setDate] = useState('');
   const [Time, setTime] = useState('');
-  const [userInfo, setUserInfo] = useState({ name: '', phone: '' ,email: ''});
+  const [userInfo, setUserInfo] = useState({ name: '', phone: '', email: '' });
   const [ticketPrice, setTicketPrice] = useState(0);
   const [totalAmount, setTotalAmount] = useState(0);
   const [bookedSeats, setBookedSeats] = useState([]);
@@ -31,8 +31,10 @@ const MovieDetails = () => {
 
   const dateOptions = ['2024-09-01', '2024-09-02', '2024-09-03', '2024-09-04', '2024-09-05'];
 
+  const isMobile = useMediaQuery('(max-width:600px)');  // Media query for responsiveness
+
   useEffect(() => {
-    const fetchMovieDetails = async () => {   // Fetching Movie Details
+    const fetchMovieDetails = async () => {
       try {
         const data = await getMovieById(movieId);
         setMovie(data);
@@ -46,7 +48,7 @@ const MovieDetails = () => {
   }, [movieId]);
 
   useEffect(() => {
-    if (Date && Time) {                            // Fetching Booked Seats
+    if (Date && Time) {  // Fetching Booked Seats
       const fetchBookedSeatsData = async () => {  
         const bookedSeats = await fetchBookedSeats(movieId, Date, Time);
         setBookedSeats(bookedSeats);
@@ -59,55 +61,33 @@ const MovieDetails = () => {
     return <Typography variant="h5" color="white">Loading...</Typography>;
   }
 
-  const handleBookingDialogOpen = () => {
-    setOpenBookingDialog(true); // Open Book Dialog
-  };
-
-  const handleBookingDialogClose = () => {
-    setOpenBookingDialog(false); // Close Book Dialog
-  };
-
-  const handleUserInfoDialogClose = () => {
-    setOpenUserInfoDialog(false); // Close User Dialog
-  };
-
-  const handleOpenPaymentDialog = () => {
-    setOpenPaymentDialog(true); // Open Payment Dialog
-  };
-
-  const handleClosePaymentDialog = () => {
-    setOpenPaymentDialog(false); // Close Payment Dialog
-  };
+  const handleBookingDialogOpen = () => setOpenBookingDialog(true);
+  const handleBookingDialogClose = () => setOpenBookingDialog(false);
+  const handleUserInfoDialogClose = () => setOpenUserInfoDialog(false);
+  const handleOpenPaymentDialog = () => setOpenPaymentDialog(true);
+  const handleClosePaymentDialog = () => setOpenPaymentDialog(false);
 
   const handleSeatClick = (seat) => {
     if (!bookedSeats.includes(seat)) {
-      setSeats((prev) => 
-        prev.includes(seat) ? prev.filter(s => s !== seat) : [...prev, seat]
-      );
+      setSeats((prev) => prev.includes(seat) ? prev.filter(s => s !== seat) : [...prev, seat]);
     }
-    
   };
 
-  const handleDateClick = (date) => {
-    setDate(date); // Set Date
-  };
-
-  const handleTimeClick = (time) => {
-    setTime(time); // Set Time
-  };
+  const handleDateClick = (date) => setDate(date);
+  const handleTimeClick = (time) => setTime(time);
 
   const handleUserChange = (event) => {
     const { name, value } = event.target;
     setUserInfo((prev) => ({ ...prev, [name]: value }));
   };
 
-  const updateTotalAmount = () => { // Counting Total Price
+  const updateTotalAmount = () => {
     const totalSeats = Seats.length;
     const amount = totalSeats * ticketPrice; 
     setTotalAmount(amount);
   };
 
-  const handleBookingConfirm = () => {   // Condition for booked tickets
+  const handleBookingConfirm = () => {
     if (!Date || !Time) {
       alert('Please select both date and time');
       return;
@@ -117,12 +97,9 @@ const MovieDetails = () => {
     setOpenUserInfoDialog(true);
   };
 
-  const handleOtpChange = (event) => {    // Set OTP
-    setOtp(event.target.value);
-  };
-  
-  const handleUserInfoConfirm = async () => {    // Collect Reservation Data
+  const handleOtpChange = (event) => setOtp(event.target.value);
 
+  const handleUserInfoConfirm = async () => {
     if (!Date || !Time || Seats.length === 0) {
       alert('Please select date, time, and seats');
       return;
@@ -132,10 +109,8 @@ const MovieDetails = () => {
       alert("Please enter valid name and phone number");
       return;
     }
-   
+
     try {
-      console.log('user_email',userInfo.email);
-      
       await sendOTP(userInfo.email);
       console.log('OTP sent successfully');
     } catch (error) {
@@ -148,19 +123,18 @@ const MovieDetails = () => {
     handleOpenPaymentDialog(); 
   };
 
-  const handleConfirmPayment = async () => {        // Payment
-    
+  const handleConfirmPayment = async () => {
     try {
-    const response = await verifyOTP(userInfo.email, otp);
-    if (response.data.message !== 'OTP verified successfully') {
-      alert('Invalid OTP. Please try again.');
+      const response = await verifyOTP(userInfo.email, otp);
+      if (response.data.message !== 'OTP verified successfully') {
+        alert('Invalid OTP. Please try again.');
+        return;
+      }
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      alert('Error verifying OTP. Please try again.');
       return;
     }
-  } catch (error) {
-    console.error('Error verifying OTP:', error);
-    alert('Error verifying OTP. Please try again.');
-    return;
-  }
 
     const reservationData = {
       date: Date,
@@ -179,15 +153,12 @@ const MovieDetails = () => {
     try {
       const response = await saveReservation(reservationData);
       console.log('Reservation successfully saved:', response.data);
-    } 
-    catch (error) {
+    } catch (error) {
       console.error('Error saving reservation:', error);
       alert('There was an error saving your reservation. Please try again.');
     }
 
     alert('Your Tickets Are Booked!'); 
-    console.log('Payment confirmed for amount:', totalAmount);
- 
     setSeats([]);
     setDate('');
     setTime('');
@@ -196,7 +167,7 @@ const MovieDetails = () => {
     handleClosePaymentDialog();
   };
 
-  const renderSeats = () => {          // Seats Rendering
+  const renderSeats = () => {
     const rows = 10;
     const columns = 20;
     const seats = [];
@@ -223,62 +194,44 @@ const MovieDetails = () => {
   };
 
   return (
-    <>
-    <Box className="container">
-      <div className="movie-details-container">
-        <div className="images-container">
+    <Box sx={{ padding: 3 }}>
+      <Grid container spacing={2}>
+        {/* Movie Details */}
+        <Grid item xs={12} md={6}>
           <img
             src={movie.image}
-            alt="Large Movie"
-            className="large-image"
+            alt="Movie"
+            style={{ width: '100%', borderRadius: 8 }}
           />
-          <img
-            src={movie.image}
-            alt="Small Movie"
-            className="small-image"
-          />
-        </div>
-
-        <div className="content-container">
-          
-          <h1>{movie.title}</h1>
-          <p><b>Genre</b>: {movie.genre}</p>
-          <p><b>Language</b>: {movie.language}</p>
-          <p><b>Duration</b>: {movie.duration}</p>
-          <p><b>Director</b>: {movie.director}</p>
-          <p>{movie.description}</p>
-          
-          <div className="trailer-container">
-            <h2>Watch the Trailer</h2>
-            {/* <video src={movie.trailer} controls width="100%" className="trailer-video"/> */}
-            <iframe src={movie.trailer} width="100%" className="trailer-video" frameBorder="0" allow="accelerometer; autoplay; clipboard-write;" referrerPolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-          </div>
-
-          <div className="book-btn">
-            <Button 
-              variant="contained" 
-              className="book-movie-button"
-              sx={{ marginTop: 2 }} 
-              onClick={handleBookingDialogOpen}
-            >
-              Book Movie
-            </Button>
-          </div>
-        </div>
-      </div>
+        </Grid>
+        <Grid item xs={12} md={6}>
+          <Typography variant="h4">{movie.title}</Typography>
+          <Typography variant="body1" sx={{ marginBottom: 1 }}><b>Genre:</b> {movie.genre}</Typography>
+          <Typography variant="body1" sx={{ marginBottom: 1 }}><b>Language:</b> {movie.language}</Typography>
+          <Typography variant="body1" sx={{ marginBottom: 1 }}><b>Duration:</b> {movie.duration}</Typography>
+          <Typography variant="body1" sx={{ marginBottom: 1 }}><b>Director:</b> {movie.director}</Typography>
+          <Typography variant="body1" sx={{ marginBottom: 2 }}>{movie.description}</Typography>
+          <Button
+            variant="contained"
+            sx={{ mt: 2 }}
+            onClick={handleBookingDialogOpen}
+          >
+            Book Movie
+          </Button>
+        </Grid>
+      </Grid>
 
       {/* Booking Dialog */}
       <Dialog open={openBookingDialog} onClose={handleBookingDialogClose} maxWidth="md" fullWidth>
-        <DialogTitle className="dialog-title">Book Movie</DialogTitle>
-        <DialogContent className="dialog-content">
+        <DialogTitle>Book Movie</DialogTitle>
+        <DialogContent>
           <Typography>Select Date:</Typography>
-          <Grid container spacing={1} sx={{ marginTop: 2 }}>
+          <Grid container spacing={2} sx={{ mt: 2 }}>
             {dateOptions.map((date) => (
               <Grid item xs={4} key={date}>
                 <Button
                   variant={Date === date ? "contained" : "outlined"}
                   onClick={() => handleDateClick(date)}
-                  className={`date-button ${Date === date ? "contained" : "outlined"}`}
                   sx={{ width: '100%' }}
                 >
                   {date}
@@ -286,30 +239,26 @@ const MovieDetails = () => {
               </Grid>
             ))}
           </Grid>
-          <Typography>Select Time:</Typography>
-          <Grid container spacing={1} sx={{ marginTop: 2 }}>
+
+          <Typography sx={{ mt: 3 }}>Select Time:</Typography>
+          <Grid container spacing={2} sx={{ mt: 2 }}>
             {movie.timeSlots.map((slot, index) => (
               <Grid item xs={4} key={index}>
                 <Button
                   variant={Time === slot ? "contained" : "outlined"}
                   onClick={() => handleTimeClick(slot)}
-                  className={`time-button ${Time === slot ? "contained" : "outlined"}`}
                   sx={{ width: '100%' }}
                 >
                   {slot}
                 </Button>
               </Grid>
             ))}
-           
-          </Grid> 
-          {/* <ul>
-           {movie.timeSlots.map((slot, index) => (
-            {/* <li key={index}>{slot}</li> */}
-        
-          <Typography variant="h6" sx={{ marginTop: 2 }}>Select Seats:</Typography>
-          <div className="seating-chart" style={{ marginTop: '10px' }}>
+          </Grid>
+
+          <Typography variant="h6" sx={{ mt: 3 }}>Select Seats:</Typography>
+          <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
             {renderSeats()}
-          </div>
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleBookingDialogClose}>Cancel</Button>
@@ -379,7 +328,6 @@ const MovieDetails = () => {
         </DialogActions>
       </Dialog>
     </Box>
-    </>
   );
 };
 
