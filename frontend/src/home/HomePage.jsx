@@ -1,24 +1,24 @@
 import { useState, useEffect } from "react";
 import Homes from "../components/homes/Homes";
 import Trending from "../components/trending/Trending";
-import Upcomming from "../components/upcoming/Upcomming";
+import MovieCard from "../components/MovieCard"; // Create this for individual movie display
 import { getAllMovies } from "../api/Movie_api/getAllmovie";
-import { Grid, Box } from "@mui/material"; // Import Grid for responsive layout
+import { Grid, Box, Typography, Container } from "@mui/material";
 
 const HomePage = () => {
-  const [items, setItems] = useState([]);
-  const [item, setItem] = useState([]);
-  const [rec, setRec] = useState([]);
+  const [upcoming, setUpcoming] = useState([]);
+  const [latest, setLatest] = useState([]);
+  const [recommended, setRecommended] = useState([]);
 
   useEffect(() => {
     const fetchMovies = async () => {
       try {
         const movies = await getAllMovies();
-        const shuffledMovies = movies.sort(() => 0.5 - Math.random());
+        const shuffled = movies.sort(() => 0.5 - Math.random());
 
-        setItems(shuffledMovies.slice(0, 5)); // Upcoming Movies
-        setItem(shuffledMovies.slice(5, 10)); // Latest Movies
-        setRec(shuffledMovies.slice(10, 15)); // Recommended Movies
+        setUpcoming(shuffled.slice(0, 5));
+        setLatest(shuffled.slice(5, 10));
+        setRecommended(shuffled.slice(10, 15));
       } catch (error) {
         console.error("Error fetching movies:", error);
       }
@@ -28,38 +28,50 @@ const HomePage = () => {
   }, []);
 
   return (
-    <Box sx={{ padding: { xs: "10px", sm: "20px", md: "40px" } }}>
-      {/* Homes Section */}
-      <Homes />
+    <Container maxWidth="xl" sx={{ py: { xs: 3, sm: 4, md: 6 } }}>
+      {/* Hero Section */}
+      <Box mb={5}>
+        <Homes />
+      </Box>
 
-      {/* Upcoming Movies Section */}
-      <Grid container spacing={2} direction="column" mb={4}>
-        <Grid item xs={12}>
-          <Upcomming items={items} title="Upcoming Movies" />
-        </Grid>
-      </Grid>
+      {/* Section Reusable */}
+      {[
+        { title: "Upcoming Movies", data: upcoming },
+        { title: "Latest Movies", data: latest },
+        { title: "Recommended For You", data: recommended }
+      ].map((section, idx) => (
+        <Box key={idx} mb={6}>
+          <Typography
+            variant="h5"
+            fontWeight="bold"
+            gutterBottom
+            sx={{ textAlign: { xs: "center", sm: "left" } }}
+          >
+            {section.title}
+          </Typography>
+          <Grid container spacing={3}>
+            {section.data.map((movie, index) => (
+              <Grid item xs={12} sm={6} md={4} lg={3} key={index}>
+                <MovieCard movie={movie} />
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+      ))}
 
-      {/* Latest Movies Section */}
-      <Grid container spacing={2} direction="column" mb={4}>
-        <Grid item xs={12}>
-          <Upcomming items={item} title="Latest Movies" />
-        </Grid>
-      </Grid>
-
-      {/* Trending Movies Section */}
-      <Grid container spacing={2} direction="column" mb={4}>
-        <Grid item xs={12}>
-          <Trending items={item} />
-        </Grid>
-      </Grid>
-
-      {/* Recommended Movies Section */}
-      <Grid container spacing={2} direction="column" mb={4}>
-        <Grid item xs={12}>
-          <Upcomming items={rec} title="Recommended Movies" />
-        </Grid>
-      </Grid>
-    </Box>
+      {/* Trending Section (Full Width) */}
+      <Box mb={6}>
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          gutterBottom
+          sx={{ textAlign: { xs: "center", sm: "left" } }}
+        >
+          Trending Now
+        </Typography>
+        <Trending items={latest} />
+      </Box>
+    </Container>
   );
 };
 
